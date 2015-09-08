@@ -90,7 +90,8 @@ class SimpleSwitch12(app_manager.RyuApp):
                         self.ports_to_block.append((switch1, port1))
                     if (switch2, port2) not in self.ports_to_block:
                         self.ports_to_block.append((switch2, port1))
-            print "ports_to_block:         ", self.ports_to_block
+            print "ports_to_block :         ", self.ports_to_block
+            print "ports_to_enable:         ", self.ports_to_enable
             print "minimum_spanning_tree:  ", list(minimum_spanning_tree)
             return minimum_spanning_tree
         kruskal()
