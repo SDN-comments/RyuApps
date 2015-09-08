@@ -17,6 +17,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
         super(SimpleSpanningTree, self).__init__(*args, **kwargs)
         self.mac_to_port = {}
+        self.topology_api_app = self
 
         self.switch_list = []
         self.switches    = []
