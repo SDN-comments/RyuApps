@@ -32,7 +32,16 @@ class SimpleSwitch12(app_manager.RyuApp):
         self.ports_to_block  = []
         self.ports_to_enable = []
 
-    def delete_flow(self, datapath):
+    def delete_flow(self, dpid):
+        flag = 1
+        i = 0
+        while i < len(self.mDataPaths):
+            if self.mDataPaths[i].id == dpid:
+                flag = 0
+                break
+        if flag:
+            return
+        datapath = self.mDataPaths[i]
         ofproto = datapath.ofproto
 
         wildcards = ofproto_v1_2.OFPFW_ALL
@@ -49,17 +58,14 @@ class SimpleSwitch12(app_manager.RyuApp):
         flag = 1
         i = 0
         while i < len(self.mDataPaths):
-            if self.mDataPaths[i].dp.id == dpid:
+            if self.mDataPaths[i].id == dpid:
                 flag = 0
                 break
         if flag:
             return
-        print type(self.mDataPaths[i])
-        print type(self.mDataPaths[i].dp)
-        print type(self.mDataPaths[i].dp.id)
         datapath = self.mDataPaths[i]
-        print type(datapath)
         ofproto = datapath.ofproto
+
         match = datapath.ofproto_parser.OFPMatch(in_port=port)
         actions = []
         inst = [datapath.ofproto_parser.OFPInstructionActions(
@@ -83,7 +89,7 @@ class SimpleSwitch12(app_manager.RyuApp):
     def get_topology_data(self, ev):
         self.switch_list = get_switch(self.topology_api_app, None)
         self.mSwitches   = [switch.dp.id for switch in self.switch_list] # switch.dp.id
-        self.mDataPaths  = [switch for switch in self.switch_list]
+        self.mDataPaths  = [switch.dp for switch in self.switch_list]
         #print type(self.mDataPaths[0])
         #print type(self.mDataPaths[0].dp)
         #print type(self.mDataPaths[0].dp.id)
