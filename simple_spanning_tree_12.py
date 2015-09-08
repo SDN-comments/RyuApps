@@ -79,7 +79,7 @@ class SimpleSwitch12(app_manager.RyuApp):
     def get_topology_data(self, ev):
         self.switch_list = get_switch(self.topology_api_app, None)
         self.mSwitches = [switch.dp.id for switch in self.switch_list]
-        self.mDataPaths = [switch.dp for switch in self.switch_list]
+        self.mDataPaths = [switch for switch in self.switch_list]
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
         print 'links       : ', self.links
