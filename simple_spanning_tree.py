@@ -20,7 +20,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
         self.topology_api_app = self
 
         self.switch_list = []
-        self.switches    = []
+        self.mSwitches    = []
         self.links_list  = []
         self.links       = []
         self.ports_to_block = {}
@@ -28,16 +28,18 @@ class SimpleSpanningTree(app_manager.RyuApp):
     @set_ev_cls(event.EventSwitchEnter)
     def get_topology_data(self, ev):
         self.switch_list = get_switch(self.topology_api_app, None)
-        self.switches = [switch.dp.id for switch in self.switch_list]
+        self.mSwitches = [switch.dp.id for switch in self.switch_list]
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
-        print 'links   : ', self.links
-        print 'switches: ', self.switches
+        print 'links_list  : ', self.links_list
+        print 'links       : ', self.links
+        print 'switch_list : ', self.switch_list
+        print 'switches    : ', self.mSwitches
         self.constructing_stp_krustal()
 
     def constructing_stp_krustal(self):
         mTopology = {
-            'switches':self.switches,
+            'switches':self.mSwitches,
             'links'   :self.links
                      }
         parent = dict()
