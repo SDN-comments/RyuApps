@@ -1,5 +1,6 @@
 __author__ = 'francklin and mk'
-
+# Run the application from command line:
+# ryu-manager --observe-links simple_spanning_tree_12.py
 
 import logging
 import struct
@@ -27,7 +28,8 @@ class SimpleSwitch12(app_manager.RyuApp):
         self.mSwitches   = []
         self.links_list  = []
         self.links       = []
-        self.ports_to_block = []
+        self.ports_to_block  = []
+        self.ports_to_enable = []
 
     @set_ev_cls(event.EventSwitchEnter)
     def get_topology_data(self, ev):
@@ -80,6 +82,9 @@ class SimpleSwitch12(app_manager.RyuApp):
                 if find(switch1) != find(switch2):
                     union(switch1, switch2)
                     minimum_spanning_tree.add(link)
+                    if (switch1, port1, switch2, port2) not in self.ports_to_enable \
+                            and (switch1, port1, switch2, port2) not in self.ports_to_enable:
+                        self.ports_to_enable.append((switch1, port1, switch2, port2))
                 else:
                     if (switch1, port1) not in self.ports_to_block:
                         self.ports_to_block.append((switch1, port1))
