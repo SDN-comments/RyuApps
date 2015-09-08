@@ -99,7 +99,8 @@ class SimpleSwitch12(app_manager.RyuApp):
 
         # Delete all flows in all datapaths
         for dp in self.mSwitches:
-            self.delete_flow(dp)
+            # self.delete_flow(dp)
+            pass
         # Install new flows
         for block in self.ports_to_block:
             dp = block[0]
