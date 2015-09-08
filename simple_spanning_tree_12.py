@@ -45,7 +45,16 @@ class SimpleSwitch12(app_manager.RyuApp):
         print "Deleting all flows in %s", datapath
         datapath.send_msg(mod)
 
-    def block_port(self, datapath, port):
+    def block_port(self, dpid, port):
+        flag = 1
+        i = 0
+        while i < len(self.mDataPaths):
+            if self.mDataPaths[i].dp.id == dpid:
+                flag = 0
+                break
+        if flag:
+            return
+        datapath = self.mDataPaths[i]
         ofproto = datapath.ofproto
         match = datapath.ofproto_parser.OFPMatch(in_port=port)
         actions = []
@@ -69,10 +78,11 @@ class SimpleSwitch12(app_manager.RyuApp):
     @set_ev_cls(event.EventSwitchEnter)
     def get_topology_data(self, ev):
         self.switch_list = get_switch(self.topology_api_app, None)
-        self.mSwitches = [switch for switch in self.switch_list] # switch.dp.id
-        print type(self.mSwitches[0])
-        print type(self.mSwitches[0].dp)
-        print type(self.mSwitches[0].dp.id)
+        self.mSwitches   = [switch.dp.id for switch in self.switch_list] # switch.dp.id
+        self.mDataPaths  = [switch for switch in self.switch_list]
+        print type(self.mDataPaths[0])
+        print type(self.mDataPaths[0].dp)
+        print type(self.mDataPaths[0].dp.id)
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
         print 'links       : ', self.links
