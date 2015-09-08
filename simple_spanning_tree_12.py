@@ -1,4 +1,4 @@
-__author__ = 'francklin and mk'
+__author__ = 'mk'
 # Run the application from command line:
 # ryu-manager --observe-links simple_spanning_tree_12.py
 
@@ -31,17 +31,60 @@ class SimpleSwitch12(app_manager.RyuApp):
         self.ports_to_block  = []
         self.ports_to_enable = []
 
+    def delete_flow(self, datapath):
+        ofproto = datapath.ofproto
+
+        wildcards = ofproto_v1_2.OFPFW_ALL
+        match = datapath.ofproto_parser.OFPMatch(
+            wildcards, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+        mod = datapath.ofproto_parser.OFPFlowMod(
+            datapath=datapath, match=match, cookie=0,
+            command=ofproto.OFPFC_DELETE)
+        print "Deleting all flows in %s", datapath
+        datapath.send_msg(mod)
+
+    def block_port(self, datapath, port):
+        ofproto = datapath.ofproto
+        match = datapath.ofproto_parser.OFPMatch(in_port=port)
+        actions = []
+        inst = [datapath.ofproto_parser.OFPInstructionActions(
+            ofproto.OFPIT_APPLY_ACTIONS, actions)]
+        mod = datapath.ofproto_parser.OFPFlowMod(
+            datapath=datapath, cookie=0, cookie_mask=0, table_id=0,
+            command=ofproto.OFPFC_ADD, idle_timeout=0, hard_timeout=0,
+            priority=0, buffer_id=ofproto.OFP_NO_BUFFER,
+            out_port=ofproto.OFPP_ANY,
+            out_group=ofproto.OFPG_ANY,
+            flags=0, match=match, instructions=inst)
+        datapath.send_msg(mod)
+        print 'Blocking switch %s, port %s', datapath, port
+
+    def enbale_port(self, dp1, port1, mac1,  dp2, port2, mac2):
+        ofproto = dp1.ofproto
+        match = dp1.ofproto_parser.OFPMatch(dst_mac=mac2)
+        pass
+
     @set_ev_cls(event.EventSwitchEnter)
     def get_topology_data(self, ev):
         self.switch_list = get_switch(self.topology_api_app, None)
         self.mSwitches = [switch.dp.id for switch in self.switch_list]
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
-        # print '\n\nlinks_list  : ', self.links_list
         print 'links       : ', self.links
-        # print 'switch_list : ', self.switch_list
         print 'switches    : ', self.mSwitches
         self.constructing_stp_krustal()
+
+        # Delete all flows in all datapaths
+        for dp in self.mSwitches:
+            self.delete_flow(dp)
+        # Install new flows
+        for block in self.ports_to_block:
+            dp = block[0]
+            port = block[1]
+            self.block_port(dp, port)
+        for enable in self.ports_to_enable:
+            pass
 
     def constructing_stp_krustal(self):
         mTopology = {
