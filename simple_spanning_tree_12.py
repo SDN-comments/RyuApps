@@ -27,7 +27,7 @@ class SimpleSwitch12(app_manager.RyuApp):
         self.mSwitches   = []
         self.links_list  = []
         self.links       = []
-        self.ports_to_block = {}
+        self.ports_to_block = []
 
     @set_ev_cls(event.EventSwitchEnter)
     def get_topology_data(self, ev):
@@ -35,9 +35,9 @@ class SimpleSwitch12(app_manager.RyuApp):
         self.mSwitches = [switch.dp.id for switch in self.switch_list]
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
-        print '\n\nlinks_list  : ', self.links_list
+        # print '\n\nlinks_list  : ', self.links_list
         print 'links       : ', self.links
-        print 'switch_list : ', self.switch_list
+        # print 'switch_list : ', self.switch_list
         print 'switches    : ', self.mSwitches
         self.constructing_stp_krustal()
 
@@ -81,17 +81,13 @@ class SimpleSwitch12(app_manager.RyuApp):
                     union(switch1, switch2)
                     minimum_spanning_tree.add(link)
                 else:
-                    if switch1 in self.ports_to_block:
-                        self.ports_to_block[switch1].append(port1)
-                    else:
-                        self.ports_to_block[switch1] = [port1]
-                    if switch2 in self.ports_to_block:
-                        self.ports_to_block[switch2].append(port2)
-                    else:
-                        self.ports_to_block[switch2] = [port2]
-            print "ports_to_block: ", self.ports_to_block
+                    if (switch1, port1) not in self.ports_to_block:
+                        self.ports_to_block.append((switch1, port1))
+                    if (switch2, port2) not in self.ports_to_block:
+                        self.ports_to_block.append((switch2, port1))
+            print "ports_to_block:         ", self.ports_to_block
+            print "minimum_spanning_tree:  ", list(minimum_spanning_tree)
             return minimum_spanning_tree
-
         kruskal()
 
 
