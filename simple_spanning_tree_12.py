@@ -44,9 +44,7 @@ class SimpleSwitch12(app_manager.RyuApp):
         datapath = self.mDataPaths[i]
         ofproto = datapath.ofproto
 
-        wildcards = ofproto_v1_2.OFPFW_ALL
-        match = datapath.ofproto_parser.OFPMatch(
-            wildcards, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        match = datapath.ofproto_parser.OFPMatch()
 
         mod = datapath.ofproto_parser.OFPFlowMod(
             datapath=datapath, match=match, cookie=0,
