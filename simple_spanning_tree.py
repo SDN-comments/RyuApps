@@ -143,6 +143,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
             return
         dst = eth.dst
         src = eth.src
+        print 'packet in, from %s to %s, port %s', src, dst, in_port
 
         dpid = datapath.id
         self.mac_to_port.setdefault(dpid, {})
