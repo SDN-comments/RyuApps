@@ -90,10 +90,9 @@ class SimpleSpanningTree(app_manager.RyuApp):
         match = dp1.ofproto_parser.OFPMatch(dst_mac=mac2)
         pass
 
-    @set_ev_cls(event.EventSwitchEnter, event.EventSwitchLeave, event.EventPortDelete, event.EventPortAdd)
+    @set_ev_cls([event.EventSwitchEnter, event.EventSwitchLeave, event.EventPortDelete, event.EventPortAdd])
     def stp_schedule(self, ev):
         self.ev_count += 1
-        print 'Switch Entering'
         count = self.ev_count
 
         def go(count):
