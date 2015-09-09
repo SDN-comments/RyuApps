@@ -115,7 +115,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
         if not self.topo_stable:
             return False
         self.topo_stable = False
-        print 'geting  topoloty data'
+        print 'Geting  topology data'
         self.switch_list = get_switch(self.topology_api_app, None)
         self.mSwitches   = [switch.dp.id for switch in self.switch_list] # switch.dp.id
         self.mDataPaths  = [switch.dp for switch in self.switch_list]
@@ -130,7 +130,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
         return True
 
     def install_flows(self):
-        print "install flows"
+        print "\n\nInstalling flows\n\n"
         # Delete all flows in all datapaths
         for dpid in self.mSwitches:
             self.delete_flow(dpid)
