@@ -2,7 +2,7 @@
 __author__ = 'mk'
 
 '''
-本 app 简单实现 STP。步骤为：
+本 app 简单实现 STP， 解除 topology 中的 loops, 防止 learning switch ARP 过程带来的 broadcast 风暴，以及各种 ping 不通或者 topology 不稳定的现象。步骤为：
 1. 获取 switches 和 links 的 Topology.
 2. 使用 Kruskal 构造 STP。
 3. 对于不在 STP 中的 link 的 port, 安装 OF flow 进行 Drop.
