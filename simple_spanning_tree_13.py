@@ -1,4 +1,19 @@
+# encoding=utf-8
 __author__ = 'mk'
+
+'''
+本 app 简单实现 STP。步骤为：
+1. 获取 switches 和 links 的 Topology.
+2. 使用 Kruskal 构造 STP。
+3. 对于不在 STP 中的 link 的 port, 安装 OF flow 进行 Drop.
+4. 由于有 learning switch, 无需安装额外的 flow 即可实现 hosts 之间 pingall 通过。
+
+使用方法：
+ryu-manager --observe-links simple_spanning_tree_13.py
+sudo mn --custom ~/mininet/mininet/MininetTopologies/Simple4S4H.py --topo mytopo --mac --switch ovsk --controller remote
+'''
+# 用一样的代码，只是 ofproto 为 1.2 则有问题。尚未了解为什么。Anyway, 用最新的总归是好些。
+
 
 from ryu.base import app_manager
 from ryu.controller import ofp_event
@@ -13,11 +28,11 @@ from ryu.topology.api import get_switch, get_link
 import thread
 import time
 
-class SimpleSwitch13(app_manager.RyuApp):
+class SimpleSpanningTree(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     def __init__(self, *args, **kwargs):
-        super(SimpleSwitch13, self).__init__(*args, **kwargs)
+        super(SimpleSpanningTree, self).__init__(*args, **kwargs)
         self.mac_to_port = {}
         self.topology_api_app = self
         self.switch_list = []
