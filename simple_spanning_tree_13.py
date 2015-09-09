@@ -94,16 +94,17 @@ class SimpleSpanningTree(app_manager.RyuApp):
     @set_ev_cls(event.EventSwitchEnter)
     def stp_schedule(self, ev):
         self.ev_count += 1
-        print 'Switch Enter !!!'
+        print 'Switch Entering'
         count = self.ev_count
 
         def go(count):
             time.sleep(5)
-            print 'count = %s, ev_count = %s', count, self.ev_count
             if count == self.ev_count:
-                print 'I m OK!!!'
+                print 'Topology is stable now'
                 self.topo_stable = True
-                self.get_topology_data()
+                if self.get_topology_data():
+                    self.construct_stp_krustal()
+                    self.install_flows()
 
         try:
             thread.start_new_thread(go, (count,))
@@ -112,23 +113,24 @@ class SimpleSpanningTree(app_manager.RyuApp):
 
     def get_topology_data(self):
         if not self.topo_stable:
-            return
+            return False
         self.topo_stable = False
-        print 'get_topoloty_data'
+        print 'geting  topoloty data'
         self.switch_list = get_switch(self.topology_api_app, None)
         self.mSwitches   = [switch.dp.id for switch in self.switch_list] # switch.dp.id
         self.mDataPaths  = [switch.dp for switch in self.switch_list]
-        print type(self.mDataPaths[0])
+        # print type(self.mDataPaths[0])
         self.links_list = get_link(self.topology_api_app, None)
         self.links = [(1, link.src.dpid, link.dst.dpid, link.src.port_no, link.dst.port_no) for link in self.links_list]
         self.links.sort()
-        # print 'links       : ', self.links
         print '\n\nlinks:'
         for lk in self.links:
             print 'switch ', lk[1], ', port ', lk[3],  '--> switch ', lk[2], ', port', lk[4]
-        print 'switches    : ', self.mSwitches
-        self.constructing_stp_krustal()
+        print '\nswitches    : ', self.mSwitches
+        return True
 
+    def install_flows(self):
+        print "install flows"
         # Delete all flows in all datapaths
         for dpid in self.mSwitches:
             self.delete_flow(dpid)
@@ -139,11 +141,11 @@ class SimpleSpanningTree(app_manager.RyuApp):
             dpid = block[0]
             port = block[1]
             self.block_port(dpid, port)
-            # for enable in self.ports_to_enable:
-            #     pass
+        # for enable in self.ports_to_enable:
+        #     pass
         self.start_learning = True
 
-    def constructing_stp_krustal(self):
+    def construct_stp_krustal(self):
         mTopology = {
             'switches':self.mSwitches,
             'links'   :self.links
@@ -194,7 +196,6 @@ class SimpleSpanningTree(app_manager.RyuApp):
                         self.ports_to_block.append((switch2, port2))
             print "ports_to_block :         ", self.ports_to_block
             print "ports_to_enable:         ", self.ports_to_enable
-            # print "minimum_spanning_tree:  ", list(minimum_spanning_tree)
             return minimum_spanning_tree
         kruskal()
 
