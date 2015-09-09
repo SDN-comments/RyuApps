@@ -1,7 +1,9 @@
 __author__ = 'mk'
+# This is not working, even if the code is the same as simple_spanning_tree_13.py.
+# Please refer to simple_spanning_tree_13.py, which works perfectly.
+
 # Run the application from command line:
 # ryu-manager --observe-links simple_spanning_tree_12.py
-# Next-step: match by the datapath id
 
 import logging
 import struct

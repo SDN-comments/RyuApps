@@ -46,7 +46,6 @@ class SimpleSpanningTree(app_manager.RyuApp):
         self.topo_stable = False
         self.start_learning = False
 
-
     def delete_flow(self, dpid):
         flag = 1
         i = -1
@@ -65,7 +64,7 @@ class SimpleSpanningTree(app_manager.RyuApp):
         mod = datapath.ofproto_parser.OFPFlowMod(
             datapath=datapath, match=match, cookie=0,
             command=ofproto.OFPFC_DELETE)
-        print "Deleting all flows in ", datapath.id
+        print "Deleting all flows in switch", datapath.id
         datapath.send_msg(mod)
 
     def block_port(self, dpid, port):
