@@ -25,6 +25,8 @@ from ryu.lib.packet import ethernet
 from ryu.lib.packet import ether_types
 from ryu.topology import event, switches
 from ryu.topology.api import get_switch, get_link
+from ryu.lib import stplib
+
 import thread
 import time
 
@@ -90,7 +92,8 @@ class SimpleSpanningTree(app_manager.RyuApp):
         match = dp1.ofproto_parser.OFPMatch(dst_mac=mac2)
         pass
 
-    @set_ev_cls([event.EventSwitchEnter, event.EventSwitchLeave, event.EventPortDelete, event.EventPortAdd])
+    @set_ev_cls([event.EventSwitchEnter, event.EventSwitchLeave, event.EventPortDelete, \
+                 event.EventPortAdd, stplib.EventPortStateChange, stplib.EventTopologyChange])
     def stp_schedule(self, ev):
         self.ev_count += 1
         count = self.ev_count
